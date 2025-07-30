@@ -27,7 +27,11 @@ class DivisionController extends Controller
 
         $records = $query->paginate(10);
 
-        return $this->paginatedResponse(DivisionResource::collection($records), 200);
+        return $this->paginatedResponse(
+            resource: DivisionResource::collection($records),
+            message: 'Success retrieving divisions.',
+            code: 200,
+        );
     }
 
     /**
@@ -35,7 +39,16 @@ class DivisionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+        ]);
+
+        $this->model->create($validated);
+
+        return $this->successResponse(
+            message: 'Division created successfully.',
+            code: 201
+        );
     }
 
     /**
@@ -43,7 +56,12 @@ class DivisionController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $division = $this->model->findOrFail($id);
+        return $this->successResponse(
+            data: new DivisionResource($division),
+            message: 'Division retrieved successfully.',
+            code: 200
+        );
     }
 
     /**
@@ -51,7 +69,18 @@ class DivisionController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $record = $this->model->findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+        ]);
+
+        $record->update($validated);
+
+        return $this->successResponse(
+            message: 'Division updated successfully.',
+            code: 200
+        );
     }
 
     /**
@@ -59,6 +88,12 @@ class DivisionController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $record = $this->model->findOrFail($id);
+        $record->delete();
+
+        return $this->successResponse(
+            message: 'Division deleted successfully.',
+            code: 200
+        );
     }
 }

@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
-import DataTable from "@/components/DataTable";
-import { useEmployee } from "@/contexts/EmployeeContext";
-import type { Employee } from "@/types/employee";
-import type { ColumnDefinition } from "@/components/DataTable";
+import DataTable from "../../../../components/DataTable";
+import { useEmployee } from "../../../../contexts/EmployeeContext";
+import type { Employee } from "../../../../types/employee";
+import type { ColumnDefinition } from "../../../../components/DataTable";
 import EmployeeModal from "./EmployeeModal";
-import { useDebounce } from "@/hooks/UseDebounce";
-import { useQueryParam, usePageParam } from "@/hooks/UseQueryParams";
+import { useDebounce } from "../../../../hooks/UseDebounce";
+import { useQueryParam, usePageParam } from "../../../../hooks/UseQueryParams";
 
 const employeeColumns: ColumnDefinition<Employee>[] = [
   { key: "name", header: "Name" },

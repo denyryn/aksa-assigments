@@ -4,7 +4,7 @@ import DataTable from "../../../../components/DataTable";
 import { useDivision } from "../../../../contexts/DivisionContext";
 import type { Division } from "../../../../types/division";
 import type { ColumnDefinition } from "../../../../components/DataTable";
-import { useDebounce } from "../../../../hooks/useDebounce";
+import { useDebounce } from "../../../../hooks/UseDebounce";
 import { useQueryParam, usePageParam } from "../../../../hooks/UseQueryParams";
 
 const divisionColumns: ColumnDefinition<Division>[] = [

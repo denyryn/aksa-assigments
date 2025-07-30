@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateEmployeeRequest;
 use Illuminate\Http\Request;
 use App\Models\Employee;
 use App\Http\Resources\EmployeeResource;
+use App\Http\Requests\StoreEmployeeRequest;
 
 class EmployeeController extends Controller
 {
@@ -32,26 +34,31 @@ class EmployeeController extends Controller
 
         $records = $query->paginate(10);
 
-        return $this->paginatedResponse(EmployeeResource::collection($records));
+        return $this->paginatedResponse(
+            resource: EmployeeResource::collection($records),
+            message: 'Success retrieving employees.',
+            code: 200
+        );
     }
 
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreEmployeeRequest $request)
     {
-        $validated = $request->validate([
-            'division_id' => ['required', 'exists:divisions,id'],
-            'image' => ['nullable', 'string'],
-            'name' => ['required', 'string', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:20'],
-            'position' => ['required', 'string', 'max:100'],
-        ]);
+        $validated = $request->validated();
 
-        $employee = Employee::create($validated);
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('public/employees');
+        }
 
-        return $this->successResponse(message: 'Employee created successfully.', code: 201);
+        $this->model->create($validated);
+
+        return $this->successResponse(
+            message: 'Employee created successfully.',
+            code: 201
+        );
     }
 
     /**
@@ -59,28 +66,28 @@ class EmployeeController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $employee = $this->model->with('division')->findOrFail($id);
+        return $this->successResponse(
+            data: new EmployeeResource($employee),
+            message: 'Employee retrieved successfully.',
+            code: 200
+        );
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateEmployeeRequest $request, string $id)
     {
         $employee = $this->model->findOrFail($id);
 
-        $validated = $request->validate([
-            'division_id' => ['sometimes', 'exists:divisions,id'],
-            'image' => ['nullable', 'string'],
-            'name' => ['sometimes', 'string', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:20'],
-            'position' => ['sometimes', 'string', 'max:100'],
-        ]);
+        $validated = $request->validated();
 
         $employee->update($validated);
 
         return $this->successResponse(
-            message: 'Employee updated successfully.'
+            message: 'Employee updated successfully.',
+            code: 200
         );
     }
 
@@ -92,6 +99,9 @@ class EmployeeController extends Controller
         $employee = $this->model->findOrFail($id);
         $employee->delete();
 
-        return $this->successResponse(message: 'Employee deleted successfully.');
+        return $this->successResponse(
+            message: 'Employee deleted successfully.',
+            code: 200
+        );
     }
 }
